@@ -50,6 +50,14 @@ def remove_keyboard() -> dict:
     return {"remove_keyboard": True}
 
 
+def format_question(question_index: int) -> str:
+    question_text = QUESTIONS[question_index][1]
+    question_number = question_index + 1
+    total_questions = len(QUESTIONS)
+
+    return f"Вопрос {question_number} из {total_questions}\n\n{question_text}"
+
+
 def get_user_state(user_id: int) -> dict:
     if user_id not in USER_STATE:
         USER_STATE[user_id] = {
@@ -155,7 +163,7 @@ async def telegram_webhook(secret: str, request: Request):
         clear_user_state(user_id)
         state = get_user_state(user_id)
 
-        first_question = QUESTIONS[0][1]
+        first_question = format_question(0)
 
         await send_message(
             chat_id,
@@ -186,7 +194,7 @@ async def telegram_webhook(secret: str, request: Request):
     state["step"] += 1
 
     if state["step"] < len(QUESTIONS):
-        next_question = QUESTIONS[state["step"]][1]
+        next_question = format_question(state["step"])
         await send_message(chat_id, next_question)
         return JSONResponse({"ok": True})
 
